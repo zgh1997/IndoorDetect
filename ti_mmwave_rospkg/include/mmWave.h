@@ -54,6 +54,7 @@ enum MmwDemo_Output_TLV_Types
 {
     MMWDEMO_OUTPUT_MSG_NULL = 0,
     /*! @brief   检测到的点数 */
+    /*! 点云数据 tlv_type == 1 */
     MMWDEMO_OUTPUT_MSG_DETECTED_POINTS,
 
     /*! @brief   数据 */
@@ -67,6 +68,18 @@ enum MmwDemo_Output_TLV_Types
 
     /*! @brief   速度、多普勒 */
     MMWDEMO_OUTPUT_MSG_RANGE_DOPPLER_HEAT_MAP,
+
+    /*! @brief   Point Cloud - Array of detected points (range/angle/doppler) */
+    MMWDEMO_OUTPUT_MSG_POINT_CLOUD,
+
+    /*! @brief   Target List - Array of detected targets (position, velocity, error covariance) */
+    MMWDEMO_OUTPUT_MSG_TARGET_LIST,
+
+    /*! @brief   Target List - Array of target indices */
+    MMWDEMO_OUTPUT_MSG_TARGET_INDEX,
+
+    /*! @brief   Classifier Output -- Array of target indices and tags */
+    MMWDEMO_OUTPUT_MSG_CLASSIFIER_OUTPUT,
 
     /*! @brief   状态信息 */
     MMWDEMO_OUTPUT_MSG_STATS,
@@ -115,6 +128,45 @@ struct MmwDemo_output_message_header_t
         uint32_t    subFrameNumber;
     };
 
+struct MmwDemo_output_message_header_t
+{
+    /*! @brief   Output buffer magic word (sync word). It is initialized to  {0x0102,0x0304,0x0506,0x0708} */
+    uint16_t    magicWord[4];
+
+    /*! @brief SW Version: : MajorNum * 2^24 + MinorNum * 2^16 + BugfixNum * 2^8 + BuildNum   */
+    uint32_t    version;
+
+    /*! @brief HW platform type */
+    uint32_t    platform;
+
+    /*! @brief Time in CPU cycles when the message was created, R4F CPU cycles */
+    uint32_t    timeStamp;
+
+    /*! @brief   Total packet length including header in Bytes */
+    uint32_t    totalPacketLen;
+
+    /*! @brief   Frame number */
+    uint32_t    frameNumber;
+
+    /*! @brief   For Advanced Frame config, this is the sub-frame number in the range
+     * 0 to (number of subframes - 1). For frame config (not advanced), this is always
+     * set to 0. */
+    uint32_t    subFrameNumber;
+
+    /*! @brief Detection Layer Margins */
+    uint32_t    chirpProcessingMargin;
+    uint32_t    frameProcessingMargin;
+
+    /*! @brief Localization Layer Timing */
+    uint32_t    trackingProcessingTime;
+    uint32_t    uartSendingTime;
+
+    /*! @brief Number of TLVs in this message*/
+    uint16_t    numTLVs;
+    /*! @brief Header checksum */
+    uint16_t    checksum;
+
+}
 
 struct MmwDemo_DetectedObj
     {
@@ -125,7 +177,73 @@ struct MmwDemo_DetectedObj
         int16_t  y;             /*!< @brief y坐标 */
         int16_t  z;             /*!< @brief z 坐标 */
     };
-    
+
+/** FIXME: Add indoor_false_det data struct */
+/**
+ * @brief
+ *  Message for reporting detected objects from data path.
+ *
+ * @details
+ *  The structure defines the message body for detected objects from from data path.
+ */
+typedef struct MmwDemo_output_message_tl_t
+{
+    /*! @brief   TLV type */
+    uint32_t    type;
+
+    /*! @brief   Length in bytes */
+    uint32_t    length;
+
+} MmwDemo_output_message_tl;
+
+/*!
+ * @brief
+ * Structure holds the message body for the  Point Cloud units
+ *
+ * @details
+ * Reporting units for range, azimuth, and doppler
+ */
+typedef struct MmwDemo_output_message_point_uint_t
+{
+    /*! @brief azimuth  reporting unit, in radians */
+    float		azimuthUnit;
+    /*! @brief Doppler  reporting unit, in m/s */
+    float		dopplerUnit;
+    /*! @brief range reporting unit, in m */
+    float		rangeUnit;
+    /*! @brief SNR  reporting unit, linear */
+    float       snrUint;
+
+} MmwDemo_output_message_point_uint;
+
+/*!
+ * @brief
+ * Structure holds the message body to UART for the  Point Cloud
+ *
+ * @details
+ * For each detected point, we report range, azimuth, and doppler
+ */
+typedef struct MmwDemo_output_message_UARTpoint_t
+{
+    /*! @brief Detected point azimuth, in number of azimuthUnit */
+    int8_t		azimuth;
+    /*! @brief Detected point doppler, in number of dopplerUnit */
+    int8_t		doppler;
+    /*! @brief Detected point range, in number of rangeUnit */
+    uint16_t		range;
+    /*! @brief Range detection SNR, in number of snrUnit */
+    uint16_t       snr;
+
+} MmwDemo_output_message_UARTpoint;
+
+
+typedef struct MmwDemo_output_message_UARTpointCloud_t
+{
+    MmwDemo_output_message_tl       header;
+    MmwDemo_output_message_point_uint pointUint;
+    MmwDemo_output_message_UARTpoint    point[1];
+} MmwDemo_output_message_UARTpointCloud;
+
 
 
 /**
@@ -162,6 +280,17 @@ typedef struct DPIF_PointCloudSideInfo_t
     int16_t  noise;
 }DPIF_PointCloudSideInfo;
 
+typedef struct UART_OutputPoint{
+    /*! @brief Detected point azimuth, in number of azimuthUnit */
+    int8_t		azimuth;
+    /*! @brief Detected point doppler, in number of dopplerUnit */
+    int8_t		doppler;
+    /*! @brief Detected point range, in number of rangeUnit */
+    uint16_t		range;
+    /*! @brief Range detection SNR, in number of snrUnit */
+    uint16_t       snr;
+};
+
 
 struct mmwDataPacket{
         
@@ -172,6 +301,9 @@ struct mmwDataPacket{
     uint16_t xyzQFormat;  // only used for SDK 1.x and 2.x
     
     MmwDemo_DetectedObj objOut;   // only used for SDK 1.x and 2.x
+
+    MmwDemo_output_message_point_uint unitOut;
+    UART_OutputPoint pointOut;
 
     DPIF_PointCloudCartesian_t newObjOut;  // used for SDK 3.x
     DPIF_PointCloudSideInfo_t  sideInfo;   // used for SDK 3.x
