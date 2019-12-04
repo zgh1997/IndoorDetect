@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories(
         src/
         src/common/
-        "C:\\ti\\mmwave_sdk_03_01_01_02\\packages"
-        "C:\\ti\\xdctools_3_51_01_18_core\\packages"
-        "C:\\ti\\bios_6_73_01_01\\packages"
+        "\\home\\zgh\\ti\\mmwave_sdk_03_01_01_02\\packages"
+        "\\home\\zgh\\ti\\xdctools_3_51_01_18_core\\packages"
+        "\\home\\zgh\\ti\\bios_6_73_01_01\\packages"
         )
 
 add_executable(IndoorDetectRepo
