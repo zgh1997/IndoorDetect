@@ -101,32 +101,34 @@ enum SorterState{ READ_HEADER,
     SWAP_BUFFERS,
     READ_SIDE_INFO};
 
-struct MmwDemo_output_message_header_t
-    {
-        /*! brief   Version: : MajorNum * 2^24 + MinorNum * 2^16 + BugfixNum * 2^8 + BuildNum   */
-        uint32_t    version;
 
-        /*! @brief   总包长度 */
-        uint32_t    totalPacketLen;
+//struct MmwDemo_output_message_header_t
+//    {
+//        /*! brief   Version: : MajorNum * 2^24 + MinorNum * 2^16 + BugfixNum * 2^8 + BuildNum   */
+//        uint32_t    version;
+//
+//        /*! @brief   总包长度 */
+//        uint32_t    totalPacketLen;
+//
+//        /*! @brief   平台类型 */
+//        uint32_t    platform;
+//
+//        /*! @brief   帧数 */
+//        uint32_t    frameNumber;
+//
+//        /*! @brief   信息在时间戳中创建的时间 */
+//        uint32_t    timeCpuCycles;
+//
+//        /*! @brief   检测到的物体数 */
+//        uint32_t    numDetectedObj;
+//
+//        /*! @brief   TLV数 */
+//        uint32_t    numTLVs;
+//
+//        /*! @brief   主帧数 */
+//        uint32_t    subFrameNumber;
+//    };
 
-        /*! @brief   平台类型 */
-        uint32_t    platform;
-        
-        /*! @brief   帧数 */
-        uint32_t    frameNumber;
-
-        /*! @brief   信息在时间戳中创建的时间 */
-        uint32_t    timeCpuCycles;
-        
-        /*! @brief   检测到的物体数 */
-        uint32_t    numDetectedObj;
-
-        /*! @brief   TLV数 */
-        uint32_t    numTLVs;
-
-        /*! @brief   主帧数 */
-        uint32_t    subFrameNumber;
-    };
 
 struct MmwDemo_output_message_header_t
 {
@@ -140,7 +142,7 @@ struct MmwDemo_output_message_header_t
     uint32_t    platform;
 
     /*! @brief Time in CPU cycles when the message was created, R4F CPU cycles */
-    uint32_t    timeStamp;
+    uint32_t    timeCpuCycles;
 
     /*! @brief   Total packet length including header in Bytes */
     uint32_t    totalPacketLen;
@@ -166,7 +168,7 @@ struct MmwDemo_output_message_header_t
     /*! @brief Header checksum */
     uint16_t    checksum;
 
-}
+};
 
 struct MmwDemo_DetectedObj
     {
@@ -203,7 +205,7 @@ typedef struct MmwDemo_output_message_tl_t
  * @details
  * Reporting units for range, azimuth, and doppler
  */
-typedef struct MmwDemo_output_message_point_uint_t
+typedef struct MmwDemo_output_message_point_unit_t
 {
     /*! @brief azimuth  reporting unit, in radians */
     float		azimuthUnit;
@@ -212,9 +214,9 @@ typedef struct MmwDemo_output_message_point_uint_t
     /*! @brief range reporting unit, in m */
     float		rangeUnit;
     /*! @brief SNR  reporting unit, linear */
-    float       snrUint;
+    float       snrUnit;
 
-} MmwDemo_output_message_point_uint;
+} MmwDemo_output_message_point_unit;
 
 /*!
  * @brief
@@ -240,7 +242,7 @@ typedef struct MmwDemo_output_message_UARTpoint_t
 typedef struct MmwDemo_output_message_UARTpointCloud_t
 {
     MmwDemo_output_message_tl       header;
-    MmwDemo_output_message_point_uint pointUint;
+    MmwDemo_output_message_point_unit pointUint;
     MmwDemo_output_message_UARTpoint    point[1];
 } MmwDemo_output_message_UARTpointCloud;
 
@@ -302,7 +304,7 @@ struct mmwDataPacket{
     
     MmwDemo_DetectedObj objOut;   // only used for SDK 1.x and 2.x
 
-    MmwDemo_output_message_point_uint unitOut;
+    MmwDemo_output_message_point_unit unitOut;
     UART_OutputPoint pointOut;
 
     DPIF_PointCloudCartesian_t newObjOut;  // used for SDK 3.x

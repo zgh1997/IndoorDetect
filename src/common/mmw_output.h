@@ -232,7 +232,7 @@ typedef struct MmwDemo_output_message_point_t
  * @details
  * Reporting units for range, azimuth, and doppler
  */
-typedef struct MmwDemo_output_message_point_uint_t
+typedef struct MmwDemo_output_message_point_unit_t
 {
     /*! @brief azimuth  reporting unit, in radians */
     float		azimuthUnit;
@@ -243,12 +243,12 @@ typedef struct MmwDemo_output_message_point_uint_t
     /*! @brief SNR  reporting unit, linear */
     float       snrUint;
 
-} MmwDemo_output_message_point_uint;
+} MmwDemo_output_message_point_unit;
 
 typedef struct MmwDemo_output_message_UARTpointCloud_t
 {
     MmwDemo_output_message_tl       header;
-    MmwDemo_output_message_point_uint pointUint;
+    MmwDemo_output_message_point_unit pointUint;
     MmwDemo_output_message_UARTpoint    point[1];
 } MmwDemo_output_message_UARTpointCloud;
 

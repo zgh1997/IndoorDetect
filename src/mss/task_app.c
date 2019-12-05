@@ -478,7 +478,7 @@ int32_t MmwDemo_CLITrackingCfg (int32_t argc, char* argv[])
         if(gMmwMssMCB.pointCloud != NULL) {
             MemoryP_ctrlFree(gMmwMssMCB.pointCloud, pointCloudSize);
         }
-        pointCloudSize = sizeof(MmwDemo_output_message_tl) + sizeof(MmwDemo_output_message_point_uint) + gMmwMssMCB.cfg.trackingCfg.config.maxNumPoints*sizeof(MmwDemo_output_message_UARTpoint);
+        pointCloudSize = sizeof(MmwDemo_output_message_tl) + sizeof(MmwDemo_output_message_point_unit) + gMmwMssMCB.cfg.trackingCfg.config.maxNumPoints*sizeof(MmwDemo_output_message_UARTpoint);
         if(gMmwMssMCB.OutputPointCloud != NULL) {
             MemoryP_ctrlFree(gMmwMssMCB.OutputPointCloud, pointCloudSize);
         }
@@ -524,7 +524,7 @@ int32_t MmwDemo_CLITrackingCfg (int32_t argc, char* argv[])
 
 
     /* Allocate memory for Point Cloud TLV */
-    pointCloudSize = sizeof(MmwDemo_output_message_tl) + sizeof(MmwDemo_output_message_point_uint) + config.maxNumPoints*sizeof(MmwDemo_output_message_UARTpoint);
+    pointCloudSize = sizeof(MmwDemo_output_message_tl) + sizeof(MmwDemo_output_message_point_unit) + config.maxNumPoints*sizeof(MmwDemo_output_message_UARTpoint);
     gMmwMssMCB.OutputPointCloud = (MmwDemo_output_message_UARTpointCloud *)MemoryP_ctrlAlloc(pointCloudSize, sizeof(float));
     gMmwMssMCB.OutputPointCloud->header.type = MMWDEMO_OUTPUT_MSG_POINT_CLOUD;
 

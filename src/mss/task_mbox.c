@@ -230,7 +230,7 @@ void MmwDemo_mboxReadTask(UArg arg0, UArg arg1)
 
                     /* copy for UART output */
                     if(numPoints) {
-                        gMmwMssMCB.OutputPointCloud->header.length = sizeof(MmwDemo_output_message_tl) + sizeof(MmwDemo_output_message_point_uint) + numPoints*sizeof(MmwDemo_output_message_UARTpoint);
+                        gMmwMssMCB.OutputPointCloud->header.length = sizeof(MmwDemo_output_message_tl) + sizeof(MmwDemo_output_message_point_unit) + numPoints*sizeof(MmwDemo_output_message_UARTpoint);
                         for(nPoint = 0; nPoint < numPoints; nPoint++) {
                             gMmwMssMCB.OutputPointCloud->point[nPoint].range = (uint16_t)(gMmwMssMCB.pointCloud->point[nPoint].range * gMmwMssMCB.mssDataPathObj.invRRes + 0.5f);
                             gMmwMssMCB.OutputPointCloud->point[nPoint].azimuth = (int8_t)(gMmwMssMCB.pointCloud->point[nPoint].azimuth * RAD2DEGREE * gMmwMssMCB.mssDataPathObj.invAzimRes + 0.5f);
@@ -239,7 +239,7 @@ void MmwDemo_mboxReadTask(UArg arg0, UArg arg1)
                         }
 						if ((gMmwMssMCB.cfg.guiMonSel.reducePointCloudOutputSize) && (numPoints > gMmwMssMCB.cfg.guiMonSel.reducePointCloudOutputSize))
 						{
-							gMmwMssMCB.OutputPointCloud->header.length = sizeof(MmwDemo_output_message_tl) + sizeof(MmwDemo_output_message_point_uint) + gMmwMssMCB.cfg.guiMonSel.reducePointCloudOutputSize*sizeof(MmwDemo_output_message_UARTpoint);
+							gMmwMssMCB.OutputPointCloud->header.length = sizeof(MmwDemo_output_message_tl) + sizeof(MmwDemo_output_message_point_unit) + gMmwMssMCB.cfg.guiMonSel.reducePointCloudOutputSize*sizeof(MmwDemo_output_message_UARTpoint);
 						}
                     }
                     else

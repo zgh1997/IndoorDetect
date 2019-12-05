@@ -286,7 +286,7 @@ void *DataUARTHandler::sortIncomingData( void )
             currentDatap += ( sizeof(mmwData.header.version) );
 
             //get platform (4 bytes)
-            memcpy( &mmwData.heakder.platform, &currentBufp->at(currentDatap), sizeof(mmwData.header.platform));
+            memcpy( &mmwData.header.platform, &currentBufp->at(currentDatap), sizeof(mmwData.header.platform));
             currentDatap += ( sizeof(mmwData.header.platform) );
 
             //get timeStamp (4 bytes)
@@ -396,8 +396,8 @@ void *DataUARTHandler::sortIncomingData( void )
             // TODO: Change point-cloud parsing module
 
             //get object point unit (Reduce cost of uart data transport)
-            memcpy(&mmwData.unitOut, &currentBufp->at(currentDatap), sizeof(MmwDemo_output_message_point_uint));
-            currentDatap += sizeof(MmwDemo_output_message_point_uint);
+            memcpy(&mmwData.unitOut, &currentBufp->at(currentDatap), sizeof(MmwDemo_output_message_point_unit));
+            currentDatap += sizeof(MmwDemo_output_message_point_unit);
 
             while( i < mmwData.numObjOut )
             {
@@ -423,7 +423,7 @@ void *DataUARTHandler::sortIncomingData( void )
 
                     // FIXME: Import math lib
                     float tempAzimuth, tempRange, tempSnr;
-                    tempAzimuth = (mmwData.unitOut.azimuthUnit * pi/180);
+                    tempAzimuth = (mmwData.unitOut.azimuthUnit * M_PI/180);
                     tempRange = mmwData.unitOut.rangeUnit * mmwData.pointOut.range;
                     tempSnr = mmwData.unitOut.snrUnit * mmwData.pointOut.snr;
 
@@ -675,7 +675,7 @@ void *DataUARTHandler::sortIncomingData( void )
                 // FIXME: Modified tlv_type for indoor_false_det bin
                 case MMWDEMO_OUTPUT_MSG_POINT_CLOUD:
                     //ROS_INFO("DataUARTHandler Sort Thread : Object TLV");
-                    mmwData.numObjOut = (tlvLen - sizeof(MmwDemo_output_message_tl) - sizeof(MmwDemo_output_message_point_uint)) /
+                    mmwData.numObjOut = (tlvLen - sizeof(MmwDemo_output_message_tl) - sizeof(MmwDemo_output_message_point_unit)) /
                             sizeof(MmwDemo_output_message_UARTpoint);
                     sorterState = READ_OBJ_STRUCT;
                     break;
