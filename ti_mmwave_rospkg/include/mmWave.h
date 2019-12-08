@@ -132,9 +132,6 @@ enum SorterState{ READ_HEADER,
 
 struct MmwDemo_output_message_header_t
 {
-    /*! @brief   Output buffer magic word (sync word). It is initialized to  {0x0102,0x0304,0x0506,0x0708} */
-    uint16_t    magicWord[4];
-
     /*! @brief SW Version: : MajorNum * 2^24 + MinorNum * 2^16 + BugfixNum * 2^8 + BuildNum   */
     uint32_t    version;
 

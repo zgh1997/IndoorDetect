@@ -299,14 +299,7 @@ void *DataUARTHandler::sortIncomingData( void )
 
                 //if packet doesn't have correct header size (which is based on platform), throw it away
             //  (does not include magicWord since it was already removed)
-            if ((mmwData.header.platform & 0xFFFF) == 0x1443)  // platform is xWR1443)
-            {
-               headerSize = 7 * 4;  // xWR1443 SDK demo header does not have subFrameNumber field
-            }
-            else
-            {
-               headerSize = 8 * 4;  // header includes subFrameNumber field
-            }
+            headerSize = sizeof(MmwDemo_output_message_header_t);
             if(currentBufp->size() < headerSize)
             {
                sorterState = SWAP_BUFFERS;
@@ -399,10 +392,20 @@ void *DataUARTHandler::sortIncomingData( void )
             memcpy(&mmwData.unitOut, &currentBufp->at(currentDatap), sizeof(MmwDemo_output_message_point_unit));
             currentDatap += sizeof(MmwDemo_output_message_point_unit);
 
-            while( i < mmwData.numObjOut )
-            {
+            // FIXME: Print info
+            std::cout << "PointNum: " << mmwData.numObjOut << std::endl;
+            std::cout << "azimuthUnit: " << mmwData.unitOut.azimuthUnit << std::endl;
+            std::cout << "rangeUnit: " << mmwData.unitOut.rangeUnit << std::endl;
+            std::cout << "snrUnit: " << mmwData.unitOut.snrUnit << std::endl;
 
-                if (((mmwData.header.version >> 24) & 0xFF) < 3)  // SDK version is older than 3.x
+
+                while( i < mmwData.numObjOut )
+            {
+                // FIXME: Print info
+                std::cout << "Point" << i << ": " << std::endl;
+                std::cout << "Currentdata: " << currentDatap << std::endl;
+                std::cout << "CurrentBufpSize: " << currentBufp->size() << std::endl;
+                if (((mmwData.header.version >> 24) & 0xFF) >= 3)  // SDK version is 3.x
                 {
 
                     //get point azimuth
@@ -437,16 +440,18 @@ void *DataUARTHandler::sortIncomingData( void )
                     temp[0] = (float) mmwData.objOut.x;
                     temp[1] = (float) mmwData.objOut.y;
                     temp[2] = (float) mmwData.objOut.z;
-                    //temp[4] = //doppler 
-                
+                    //temp[4] = //doppler
+
+                    /*
                     for(int j = 0; j < 3; j++)
                     {
                         if(temp[j] > 32767)
                             temp[j] -= 65535;
-                    
+
                         temp[j] = temp[j] / pow(2,mmwData.xyzQFormat);
-                     }   
-                 
+                     }
+                    */
+
                     // Convert intensity to dB
                     temp[3] = 10 * log10(tempSnr + 1);  // intensity
                 
@@ -455,31 +460,6 @@ void *DataUARTHandler::sortIncomingData( void )
                     RScan->points[i].y = -temp[0];  // ROS standard coordinate system Y-axis is left which is the mmWave sensor -(X-axis)
                     RScan->points[i].z = temp[2];   // ROS standard coordinate system Z-axis is up which is the same as mmWave sensor Z-axis
                     RScan->points[i].intensity = temp[3];
-                }
-                else  // SDK version is 3.x+
-                {
-                    //get object x-coordinate (meters)
-                    memcpy( &mmwData.newObjOut.x, &currentBufp->at(currentDatap), sizeof(mmwData.newObjOut.x));
-                    currentDatap += ( sizeof(mmwData.newObjOut.x) );
-                
-                    //get object y-coordinate (meters)
-                    memcpy( &mmwData.newObjOut.y, &currentBufp->at(currentDatap), sizeof(mmwData.newObjOut.y));
-                    currentDatap += ( sizeof(mmwData.newObjOut.y) );
-                
-                    //get object z-coordinate (meters)
-                    memcpy( &mmwData.newObjOut.z, &currentBufp->at(currentDatap), sizeof(mmwData.newObjOut.z));
-                    currentDatap += ( sizeof(mmwData.newObjOut.z) );
-                
-                    //get object velocity (m/s)
-                    memcpy( &mmwData.newObjOut.velocity, &currentBufp->at(currentDatap), sizeof(mmwData.newObjOut.velocity));
-                    currentDatap += ( sizeof(mmwData.newObjOut.velocity) );
-
-                    // Map mmWave sensor coordinates to ROS coordinate system
-                    RScan->points[i].x = mmwData.newObjOut.y;   // ROS standard coordinate system X-axis is forward which is the mmWave sensor Y-axis
-                    RScan->points[i].y = -mmwData.newObjOut.x;  // ROS standard coordinate system Y-axis is left which is the mmWave sensor -(X-axis)
-                    RScan->points[i].z = mmwData.newObjOut.z;   // ROS standard coordinate system Z-axis is up which is the same as mmWave sensor Z-axis
-
-                    // For SDK 3.x, intensity is replaced by snr in sideInfo and is parsed in the READ_SIDE_INFO code
                 }
                 i++;
 
@@ -516,7 +496,7 @@ void *DataUARTHandler::sortIncomingData( void )
                      //ROS_INFO("DataUARTHandler Sort Thread : Parsing Side Info i=%d and tlvLen = %u", i, tlvLen);
               }
             
-              currentDatap += tlvLen;
+              currentDatap += (tlvLen - sizeof(MmwDemo_output_message_tl));
             }
 
             sorterState = CHECK_TLV_TYPE;
@@ -675,8 +655,12 @@ void *DataUARTHandler::sortIncomingData( void )
                 // FIXME: Modified tlv_type for indoor_false_det bin
                 case MMWDEMO_OUTPUT_MSG_POINT_CLOUD:
                     //ROS_INFO("DataUARTHandler Sort Thread : Object TLV");
-                    mmwData.numObjOut = (tlvLen - sizeof(MmwDemo_output_message_tl) - sizeof(MmwDemo_output_message_point_unit)) /
-                            sizeof(MmwDemo_output_message_UARTpoint);
+                    mmwData.numObjOut = (tlvLen - sizeof(MmwDemo_output_message_tl) - sizeof(MmwDemo_output_message_point_unit)) / sizeof(MmwDemo_output_message_UARTpoint);
+
+                    // FIXME: Print info
+                    std::cout << "Tlvlen: " << tlvLen << std::endl;
+                    std::cout << "NumObj: " << mmwData.numObjOut << std::endl;
+
                     sorterState = READ_OBJ_STRUCT;
                     break;
                 
@@ -718,7 +702,7 @@ void *DataUARTHandler::sortIncomingData( void )
                 default:
                     // Skip target info of Indoor_false_det
                     if(tlvLen != 0) {
-                        currentDatap += tlvLen;
+                        currentDatap += (tlvLen-sizeof(MmwDemo_output_message_tl));
                     }
                     sorterState = CHECK_TLV_TYPE;
 

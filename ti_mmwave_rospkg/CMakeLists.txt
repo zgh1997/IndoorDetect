@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ti_mmwave_rospkg)
 
+SET(CMAKE_BUILD_TYPE "Debug")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+
 ## Add support for C++11, supported in ROS Kinetic and newer
  add_definitions(-std=c++11)
 
