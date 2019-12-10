@@ -347,7 +347,7 @@ void *DataUARTHandler::sortIncomingData( void )
             break;
             
          case READ_OBJ_STRUCT:
-            
+
             // CHECK_TLV_TYPE code has already read tlvType and tlvLen
 
             i = 0;
@@ -426,7 +426,7 @@ void *DataUARTHandler::sortIncomingData( void )
 
                     // FIXME: Import math lib
                     float tempAzimuth, tempRange, tempSnr;
-                    tempAzimuth = (mmwData.unitOut.azimuthUnit * M_PI/180);
+                    tempAzimuth = (mmwData.unitOut.azimuthUnit * mmwData.pointOut.azimuth * M_PI/180);
                     tempRange = mmwData.unitOut.rangeUnit * mmwData.pointOut.range;
                     tempSnr = mmwData.unitOut.snrUnit * mmwData.pointOut.snr;
 
@@ -436,7 +436,7 @@ void *DataUARTHandler::sortIncomingData( void )
 
                     //convert from Qformat to float(meters)
                     float temp[4];
-                
+
                     temp[0] = (float) mmwData.objOut.x;
                     temp[1] = (float) mmwData.objOut.y;
                     temp[2] = (float) mmwData.objOut.z;
@@ -450,16 +450,16 @@ void *DataUARTHandler::sortIncomingData( void )
 
                         temp[j] = temp[j] / pow(2,mmwData.xyzQFormat);
                      }
-                    */
 
                     // Convert intensity to dB
                     temp[3] = 10 * log10(tempSnr + 1);  // intensity
-                
+
+                    */
+
                     // Map mmWave sensor coordinates to ROS coordinate system
                     RScan->points[i].x = temp[1];   // ROS standard coordinate system X-axis is forward which is the mmWave sensor Y-axis
                     RScan->points[i].y = -temp[0];  // ROS standard coordinate system Y-axis is left which is the mmWave sensor -(X-axis)
                     RScan->points[i].z = temp[2];   // ROS standard coordinate system Z-axis is up which is the same as mmWave sensor Z-axis
-                    RScan->points[i].intensity = temp[3];
                 }
                 i++;
 

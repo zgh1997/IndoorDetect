@@ -172,9 +172,9 @@ struct MmwDemo_DetectedObj
         uint16_t   rangeIdx;     /*!< @brief 速度索引 */
         uint16_t   dopplerIdx;   /*!< @brief 多普勒索引 */
         uint16_t   peakVal;      /*!< @brief 峰值 */
-        int16_t  x;             /*!< @brief ｘ坐标 */
-        int16_t  y;             /*!< @brief y坐标 */
-        int16_t  z;             /*!< @brief z 坐标 */
+        float  x;             /*!< @brief ｘ坐标 */
+        float  y;             /*!< @brief y坐标 */
+        float  z;             /*!< @brief z 坐标 */
     };
 
 /** FIXME: Add indoor_false_det data struct */
